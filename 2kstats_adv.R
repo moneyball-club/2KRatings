@@ -116,7 +116,9 @@ for (team in teams){
   data.raw <- html_table(page, fill=TRUE)
   data.raw <- cbind(as.data.frame(data.raw), team, "2020")
   data.raw <- data.raw[, -c(4,5,8)]
-  names(data.raw)[c(3,7)] <- c("Rating","Year")
+  names(data.raw)[c(2,3,4,5,7)] <- c("Player.Name","Rating","Pos","Ht","Year")
+  # names(data.raw)
+  # names(masterdf)
   masterdf <- rbind(masterdf, data.raw)
 }
 
@@ -148,7 +150,7 @@ bref_players_stats(seasons = 2018:2020, tables = "advanced",
                    include_all_nba = F, only_totals = TRUE, nest_data = FALSE,
                    assign_to_environment = TRUE, widen_data = TRUE, join_data = TRUE,
                    return_message = TRUE)
-##### PREP PER GAME #####
+##### PREP ADV #####
 class(dataBREFPlayerAdvanced)
 head(dataBREFPlayerAdvanced)
 View(dataBREFPlayerAdvanced)
@@ -194,9 +196,11 @@ transformed<-predict(preProcValues, newdata = corrvariables)
 ready_data<-data.frame(merged_data[, c(1,2,3,4,29,30,31)],transformed[,-25])
 
 ready_data <- na.omit(ready_data)
+View(ready_data)
 
 train_data <- subset(ready_data, Year==2018 | Year==2019)
 test_data <- subset(ready_data, Year == 2020)
+View(test_data)
 
 
 ##### MODEL TESTING #####
@@ -250,10 +254,10 @@ results_data_lm_adv$errors <- abs(results_data_lm_adv$Rating - results_data_lm_a
 sum(results_data_lm_adv$errors)
 #1176
 
-lm_imp <- varImp(lm_model, scale = FALSE)
+lm_imp <- varImp(lm_model_adv, scale = FALSE)
 plot(lm_imp)
 
-p <- ggplot(results_data_lm_game, aes(x = Rating, y = lm_predictions_game, text = Player.Name)) +
+p <- ggplot(results_data_lm_adv, aes(x = Rating, y = lm_predictions_adv, text = Player.Name)) +
   geom_point() 
 
 lm_p <- ggplotly(p)
